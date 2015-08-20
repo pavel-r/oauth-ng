@@ -70,6 +70,21 @@ accessTokenService.factory('AccessToken', ['Storage', '$rootScope', '$location',
     }
   };
 
+  /**
+   * Get the access token from a struct and save it
+   * @param params
+   */
+  service.setToken = function(params){
+    if(params){
+      setToken(params);
+      setExpiresAt();
+      // We have to save it again to make sure expires_at is set
+      //  and the expiry event is set up properly
+      setToken(this.token);
+      $rootScope.$broadcast('oauth:login', service.token);
+    }
+  };
+
   /* * * * * * * * * *
    * PRIVATE METHODS *
    * * * * * * * * * */
