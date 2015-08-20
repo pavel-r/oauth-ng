@@ -1,4 +1,4 @@
-/* oauth-ng - v0.4.2 - 2015-06-19 */
+/* oauth-ng - v0.4.2 - 2015-08-20 */
 
 'use strict';
 
@@ -79,6 +79,21 @@ accessTokenService.factory('AccessToken', ['Storage', '$rootScope', '$location',
 
     if(params){
       removeFragment();
+      setToken(params);
+      setExpiresAt();
+      // We have to save it again to make sure expires_at is set
+      //  and the expiry event is set up properly
+      setToken(this.token);
+      $rootScope.$broadcast('oauth:login', service.token);
+    }
+  };
+
+  /**
+   * Get the access token from a struct and save it
+   * @param params
+   */
+  service.setToken = function(params){
+    if(params){
       setToken(params);
       setExpiresAt();
       // We have to save it again to make sure expires_at is set
@@ -170,7 +185,7 @@ accessTokenService.factory('AccessToken', ['Storage', '$rootScope', '$location',
       return;
     }
     var time = (new Date(service.token.expires_at))-(new Date());
-    if(time){
+    if(time && time > 0){
       $interval(function(){
         $rootScope.$broadcast('oauth:expired', service.token);
       }, time, 1);
